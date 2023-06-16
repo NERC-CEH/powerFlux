@@ -1,22 +1,32 @@
-Package: template
-Title: Package Title (one line, title case)
-Version: 0.0.0.9000
-Authors@R: person("Peter", "Levy", 
-                  email = "plevy@ceh.ac.uk", 
+Package: powerFlux
+Title: Power Flux
+Version: 0.0.1
+Authors@R: person("Peter", "Levy",
+                  email = "plevy@ceh.ac.uk",
                   role = c("aut", "cre", "cph"),
                   comment=c(ORCID = "https://orcid.org/0000-0002-8505-1901"))
-Description: This package is a template for my research projects using the R
-             package structure (research compendium).  This package also includes
-             a helpful template function to deploy the template as a new repository
-             with a different name.  
+Description: This package is provides code for statistical power analysis of
+             experiments based on chamber flux measurements, particularly those
+             looking at emission factors for N2O.
+Encoding: UTF-8
 Depends: R (>= 3.1.2)
 License: MIT + file LICENSE
 LazyData: true
-Suggests: testthat,
+Suggests:
+    testthat,
     knitr,
-    covr
+    covr,
+    roxygen2,
+    rmarkdown,
+    viridis,
+    pkgload
 VignetteBuilder: knitr
-Imports: 
-    git2r,
-    gh
-RoxygenNote: 6.0.1
+Imports:
+    here,
+    ggplot2,
+    ggforce,
+    data.table,
+    caTools,
+    units,
+    rlang (>= 0.4.11)
+RoxygenNote: 7.2.3

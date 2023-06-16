@@ -1,89 +1,86 @@
+---
+title: 'Statistical Power analysis and uncertainty quantification for chamber measurements of N$_2$O and CH$_4$ fluxes'
+author: 
+- Peter Levy and Nick Cowan
+date: Centre for Ecology and Hydrology, Bush Estate, Penicuik, EH26 0QB, U.K.
+output:
+  html_document: 
+    toc: no
+    keep_md: yes
+---
+
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-[![Travis-CI Build Status](https://travis-ci.org/cboettig/template.svg?branch=master)](https://travis-ci.org/cboettig/template) [![Coverage Status](https://coveralls.io/repos/cboettig/template/badge.svg)](https://coveralls.io/r/cboettig/template)
 
-This repository provides the current template I use for new research projects.
 
-Why an R package structure?
----------------------------
 
-Academic research isn't software development, and there are many other templates for how to organize a research project. So why follow an R package layout? Simply put, this is because the layout of an R package is familiar to a larger audience and allows me to leverage a rich array of tools that don't exist for more custom approaches.
+## Introduction 
+This document describes the `powerFlux` R package for statistical power analysis and uncertainty quantification for chamber measurements of N$_2$O and CH$_4$ fluxes.  Most users will only use one or two functions `get_ci_flux` and `get_omega_ci`, which return the expected confidence intervals in instantaneous flux measurements and cumulative fluxes expressed as emission factors.
 
-"But"", you say, "a paper doesn't have unit tests, or documented functions! Surely that's a lot of needless overhead in doing this!?"
+## Installation
+The package can be installed directly from a bundled .tar.gz file or directly from GitHub, using `install_github` from remotes.
 
-Exactly...
 
-While there is certainly no need to use all the elements of a package in every research project, or even to have a package that can pass `devtools::check()` or even `devtools::install()` for it to be useful. Most generic layout advice starts sounding like an R package pretty quickly: have a directory for `data/`, a separate one for `R/` scripts, another one for the manuscript files, and so forth. [Temple Lang and Gentleman (2007)]( "http://doi.org/10.1198/106186007X178663") advance the proposal for using the R package structure as a "Research Compendium," an idea that has since caught on with many others.
+```r
+# If not already installed:
+# install.packages(c("remotes"))
+library(remotes)  # for install_github
 
-As a project grows in size and collaboration, having the more rigid structure offered by a package format becomes increasingly valuable. Packages can automate installation of dependencies, perform checks that changes have not broken code, and provide a modular and highly tested framework for collecting together the three essential elements: data, code, and manuscript-quality documentation, in a powerful and feature-rich environment.
-
-Steps to create the template
-----------------------------
-
-To use this template, I will usually clone this repo and just remove the `.git` record, starting off a new project accordingly. Here I document the steps used to set up this template from scratch, which permits a slightly more modular approach. If this were fully automated it would be preferable to copying, but has not yet reached that stage.
-
-The template can be initialized with functions from devtools:
-
-``` r
-devtools::install_github("hadley/devtools")
-library("devtools")
+# install powerFlux from github
+install_github("NERC-CEH/powerFlux")
 ```
 
-Configure some default options for `devtools`, see `package?devtools`:
+## Using the package
+Now we can load the package.
 
-``` r
-options(devtools.name = "Carl Boettiger", 
-        devtools.desc.author = "person('Carl', 'Boettiger', email='cboettig@gmail.com', role = c('aut', 'cre'))",
-        devtools.desc.license = "MIT + file LICENSE")
+```r
+library(powerFlux)
 ```
 
-Run devtools templating tools
+You can then call the `powerFlux` functions directly from the R command line, as described below. The basic input is a set of parameters which define the chamber set-up and sampling characteristics.
 
-``` r
-setup()
-use_testthat()
-use_vignette("intro")
-use_travis()
-use_package_doc()
-use_cran_comments()
-use_readme_rmd()
+
+## Individual chamber flux measurements
+The flux of a GHG from the soil surface within a chamber is calculated from the rate of change in the mixing ratio $d \chi / d t$ (in mol GHG/mol air/ s), adjusted for the density of air per unit surface area:
+
+$$F = \frac{d \chi} {d t} \times \rho \frac{V}{A}$$
+
+where $F$ is the surface flux in mol GHG/m^2^/s, $\rho$ is the density of air in mol/m^3^, and $V$ and $A$ are the volume and area of the chamber (which simplifies to the height $h = V/A$ for most common chamber shapes). The term $\rho h$ can be considered a constant for a given chamber under typical conditions.
+
+The term $d \chi / d t$ is usually estimated as the slope $\beta$ of a linear regression between $\chi$ and time $t$ during the chamber closure (although various methods accounting for non-linearity are also used).
+The uncertainty in this term is estimated by the standard algebra of linear regression, where the 95% confidence interval (CI) in the slope $\beta$ is given:
+
+$$CI_{\beta}^{95} = \sqrt{ \frac{\sigma_\chi^2} {n-1 \sum (t_i - \bar{t})^2} } \times \mathbb{T}$$
+
+where $\sigma\chi^2$ is the residual variance, $n$ is the number of data points, $\sum (t_i - \bar{t})^2$ is the variance in the $x$ independent variable, time, and $\mathbb{T}$ represents the t statistic, with a value of 1.96 for a sample size greater than 20. We can define a function which calculates this 95% confidence interval in chamber flux measurements, given the characteristic of the chamber and analyser.
+
+The uncertainty, as quantified by the 95 % confidence interval, depends on the residual (unexplained) variation in mixing ratio $\sigma_\chi$ (`sigma_chi` in the code), the number of gas samples, their spread over time, and the chamber height. We use the `units` package to take care of unit conversions. To estimate $\sigma_\chi$ a priori, we can use the noise or precision quoted for the gas analyser - the standard deviation $\sigma$ in recorded $\chi$ under constant conditions. This will be an underestimate, and there will be additional variation coming from all the vagaries of sampling from a chamber (imperfect mixing, pressure fluctuations, leaks, etc.). Empirically, $\sigma_\chi$ is the residual standard error in the linear regression of $\chi$ versus $t$, as this includes both sources of error, so previous values of this can be used to estimate for future experiments. Chamber height comes into the equation because it determines the scaling factor between changes in mixing ratio and the calculated flux: the same flux will have a smaller effect on the mixing ratio in a tall chamber compared to a short one.
+
+Below, we specify $\sigma_\chi$ of 20 nmol N$_2$O/mol, 
+10 gas samples, spread regularly over time 5 minutes, and a chamber height of 23 cm.
+
+
+```r
+sigma_chi <- set_units(20, nmol_n2o/mol)
+height <- set_units(0.23, m)
+t_max <- set_units(5 * 60, s)
+n_gas <- 10
+v_t <- get_v_t(t_max, n_gas)
+sigma_t <- get_sigma_t(v_t)
+
+ci <- get_ci_flux(sigma_chi = sigma_chi,
+            height = height,
+            sigma_t = sigma_t,
+            n_gas = n_gas)
+print(ci)
 ```
 
-Additional modifications and things not yet automated by `devtools`:
-
--   Add the now-required LICENSE template data
--   add `covr` to the suggests list
-
-``` r
-writeLines(paste("YEAR: ", format(Sys.Date(), "%Y"), "\n", 
-                 "COPYRIGHT HOLDER: ", getOption("devtools.name"), sep=""),
-           con="LICENSE")
-
-use_package("covr", "suggests")
-
-write(
-"
-r_binary_packages:
-  - testthat
-  - knitr
-
-r_github_packages:
-  - jimhester/covr
-
-after_success:
-  - Rscript -e 'library(covr); coveralls()'",
-file=".travis.yml", append=TRUE)
+```
+## 1.381144 [nmol_n2o/m^2/s]
 ```
 
-### Further steps that aren't automated
+The 95 % confidence interval for a flux measured with this system will be $\pm$ 1.381 in its associated units.
 
-Further steps aren't yet automated in devtools or by me; as it's easier to add these manually to the template and then use the template when starting a new project.
+## Uncertainty in Cumulative flux or Emission Factors
 
--   add the travis shield to README, (as prompted to do by `add_travis()`)
--   Turn on repo at coveralls.io and add the shield to README
--   adding additional dependencies to DESCRIPTION with `use_package`, and also add to `.travis.yml` manually, e.g. under `r_binary_packages:`, `r_github_packages`, or `r_packages`
--   add additional data with `use_data()` or possibly `use_raw_data()` (for scripts that import and clean data first)
-
-Manuscript elements
--------------------
-
--   Recent developments in `rmarkdown`, `knitr` and `rticles` packages greatly faciliates using vignettes as full manuscripts. The above step adds only a basic HTML templated vignette. This package includes a template for a latex/pdf manuscript using these tools. The actual template appropriate for a project may be better selected from (possibly my fork of) the `rticles` templates.
+tbc

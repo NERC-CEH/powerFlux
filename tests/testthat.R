@@ -1,4 +1,4 @@
 library(testthat)
-library(template)
+library(powerFlux)
 
-test_check("template")
+test_check("powerFlux")

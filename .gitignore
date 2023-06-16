@@ -1,5 +1,8 @@
 .Rproj.user
 .Rhistory
 .RData
+data-raw
 inst/doc
 vignettes/*_cache/
+/doc/
+/Meta/

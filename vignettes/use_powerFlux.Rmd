@@ -1,27 +1,36 @@
 ---
-title: 'Statistical Power analysis and uncertainty quantification for chamber measurements of N$_2$O and CH$_4$ fluxes'
-author: 
-- Peter Levy and Nick Cowan
-date: Centre for Ecology and Hydrology, Bush Estate, Penicuik, EH26 0QB, U.K.
-output:
-  html_document: 
-    toc: no
-    keep_md: yes
+title: "Using powerFlux"
+author: "Peter Levy"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using powerFlux}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
 ---
-
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, eval=FALSE, include = FALSE}
 library(rmarkdown)
-system.time(render("README.Rmd", output_file = "README.html"))
+system.time(render("use_powerFlux.Rmd", output_file = "use_powerFlux.html"))
+```
+
+```{r, attachPackages, echo = FALSE, warning=FALSE, message=FALSE}
+library(here)
+library(units)
+library(ggplot2)
+library(ggforce)
+library(viridis)
+library(powerFlux)
+pkgload::load_all(".")
+do_all <- FALSE # TRUE
 ```
 
 ## Introduction 
-This document describes the `powerFlux` R package for statistical power analysis and uncertainty quantification for chamber measurements of N$_2$O and CH$_4$ fluxes.  Most users will only use one or two functions `get_ci_flux` and `get_omega_ci`, which return the expected confidence intervals in instantaneous flux measurements and cumulative fluxes expressed as emission factors.
+This document describes the `powerFlux` R package for statistical power analysis and uncertainty quantification for chamber measurements of N$_2$O and CH$_4$ fluxes.  Most users will only use one or two functions `get_ci_flux` and `get_ci_omega`, which return the expected confidence intervals in instantaneous flux measurements and cumulative fluxes expressed as emission factors.
 
 ## Installation
-The package can be installed directly from a bundled .tar.gz file or directly from GitHub, using `install_github` from remotes.
+The package can be installed directly from a bundled .tar.gz file.
+Alternatively, and to keep versions up to date more easily, the package can be installed directly from GitHub, using `install_github` from remotes.
 
 ```{r, eval = FALSE}
 # If not already installed:
@@ -39,7 +48,6 @@ library(powerFlux)
 ```
 
 You can then call the `powerFlux` functions directly from the R command line, as described below. The basic input is a set of parameters which define the chamber set-up and sampling characteristics.
-
 
 ## Individual chamber flux measurements
 The flux of a GHG from the soil surface within a chamber is calculated from the rate of change in the mixing ratio $d \chi / d t$ (in mol GHG/mol air/ s), adjusted for the density of air per unit surface area:
@@ -76,6 +84,49 @@ print(ci)
 ```
 
 The 95 % confidence interval for a flux measured with this system will be $\pm$ `r round(ci, 3)` in its associated units.
+
+
+To illustrate, we can calculate the CI in flux measurements from a chamber of height 0.23 m and an analyser with sigma_chi of 20 nmol/mol (standard deviation) and 10 samples recorded over 5 minutes. 
+ 
+```{r}
+meanlog <- 0
+sdlog <- 1.5
+max_flux <- set_units(5, nmol_n2o / m^2 /s)
+get_dt_ci(height = height, sigma_chi = sigma_chi, sigma_t = sigma_t, n_gas = n_gas,
+            meanlog = 0, sdlog = 1, max_flux = max_flux)
+```
+
+The CI is a constant value given these characteristics. However, we might also consider this in relative terms compared to the flux itself, rather like a signal-to-sigma_chi ratio (SNR).
+Therefore, we express this in relation to a range of typical or possible fluxes, up to a maximum value `max_flux`, with their probability of occuring specified by a lognormal distribution, with the parameter `meanlog` and `sdlog`.
+
+```{r}
+dt <- get_dt_ci(height = height, sigma_chi = sigma_chi, sigma_t = sigma_t, n_gas = n_gas,
+            meanlog = 0, sdlog = 1, max_flux = max_flux)
+p <- ggplot(dt, aes(flux, prob))
+p <- p + geom_area(aes(fill = flux > ci_flux))
+p <- p + geom_line()
+p
+```
+
+The figure above shows the specified distribution of flux values in relation to the calculated CI of 1.24 nmol/m^2^/s. This shows that 
+`r round(dlnorm(1.24, meanlog = 0, sdlog = 1)*100, 0)`% of fluxes (shaded red) will be lower than the CI, which can be considered as a limit of detection for the chamber-analyser system. 
+
+
+### Variation in CI with chamber height
+
+Using this function, we can examine how CI varies with various properties of the chamber-analyser system. Firstly, we see how CI is influenced by chamber height.
+
+```{r}
+v_height <- set_units(seq(0.1, 0.9, by = 0.1), m)
+l_dt <- lapply(v_height, function(i){get_dt_ci(height = i)})
+dt_h <- data.table::rbindlist(l_dt)
+p <- ggplot(dt_h, aes(flux, prob))
+p <- p + geom_area(aes(fill = flux > ci_flux))
+p <- p + geom_line()
+p <- p + facet_wrap(~ height) + ggtitle("Chamber height in m")
+p
+```
+
 
 ## Uncertainty in Cumulative flux or Emission Factors
 
