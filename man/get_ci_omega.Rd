@@ -5,16 +5,16 @@
 \title{get_ci_omega}
 \usage{
 get_ci_omega(
-  sigma_chi = set_units(10, nmol_n2o/mol),
-  height = set_units(0.23, m),
-  t_max = set_units(30 * 60, s),
+  sigma_chi = units::set_units(10, nmol_n2o/mol),
+  height = units::set_units(0.23, m),
+  t_max = units::set_units(30 * 60, s),
   n_gas = 4,
-  N_appl = set_units(0.1489069 * 1e+09, nmol_n2o/m^2),
+  N_appl = units::set_units(0.1489069 * 1e+09, nmol_n2o/m^2),
   omega = 0.01,
   n_days = 28,
   n_mmnt_per_day = 10,
   n_sims = 3,
-  d_max = set_units(28 * secs_per_day, s),
+  d_max = units::set_units(28 * secs_per_day, s),
   delta = 11.8,
   k = 0.86,
   sigma_s = 1.5,
@@ -26,15 +26,15 @@ get_ci_omega(
 )
 }
 \arguments{
-\item{sigma_chi}{PARAM_DESCRIPTION, Default: set_units(10, nmol_n2o/mol)}
+\item{sigma_chi}{PARAM_DESCRIPTION, Default: units::set_units(10, nmol_n2o/mol)}
 
-\item{height}{PARAM_DESCRIPTION, Default: set_units(0.23, m)}
+\item{height}{PARAM_DESCRIPTION, Default: units::set_units(0.23, m)}
 
-\item{t_max}{PARAM_DESCRIPTION, Default: set_units(30 * 60, s)}
+\item{t_max}{PARAM_DESCRIPTION, Default: units::set_units(30 * 60, s)}
 
 \item{n_gas}{PARAM_DESCRIPTION, Default: 4}
 
-\item{N_appl}{PARAM_DESCRIPTION, Default: set_units(0.1489069 * 1e+09, nmol_n2o/m^2)}
+\item{N_appl}{PARAM_DESCRIPTION, Default: units::set_units(0.1489069 * 1e+09, nmol_n2o/m^2)}
 
 \item{omega}{PARAM_DESCRIPTION, Default: 0.01}
 
@@ -44,7 +44,7 @@ get_ci_omega(
 
 \item{n_sims}{PARAM_DESCRIPTION, Default: 3}
 
-\item{d_max}{PARAM_DESCRIPTION, Default: set_units(28 * secs_per_day, s)}
+\item{d_max}{PARAM_DESCRIPTION, Default: units::set_units(28 * secs_per_day, s)}
 
 \item{delta}{PARAM_DESCRIPTION, Default: 11.8}
 

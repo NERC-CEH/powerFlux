@@ -2,12 +2,14 @@
 #' @import ggforce
 #' @import units
 #' @importFrom caTools trapz
+#' @importFrom units install_unit
+#' @importFrom units set_units
 
 # constants
 # define the conversion unit between g N and moles of N2O
-install_unit("mol_n2o", "28 g", "mol wt of N in N2O")
+units::install_unit("mol_n2o", "28 g", "mol wt of N in N2O")
 secs_per_day <- 24 * 60 * 60
-rho <- set_units(41.742, mol / m^3) # air density at STP, mol m-3
+rho <- units::set_units(41.742, mol / m^3) # air density at STP, mol m-3
 
 #' @title RMSE
 #' @description Function that returns Root Mean Squared Error
@@ -57,9 +59,9 @@ get_sigma_t <- function(v_t) {
 
 #' @title get_ci_flux
 #' @description Calculates the 95 % confidence interval for a flux measurement
-#' @param sigma_chi PARAM_DESCRIPTION, Default: set_units(25, nmol_n2o/mol)
-#' @param height PARAM_DESCRIPTION, Default: set_units(0.23, m)
-#' @param sigma_t PARAM_DESCRIPTION, Default: set_units(90, s)
+#' @param sigma_chi PARAM_DESCRIPTION, Default: units::set_units(25, nmol_n2o/mol)
+#' @param height PARAM_DESCRIPTION, Default: units::set_units(0.23, m)
+#' @param sigma_t PARAM_DESCRIPTION, Default: units::set_units(90, s)
 #' @param n_gas PARAM_DESCRIPTION, Default: 10
 #' @return The 95 % confidence interval for a flux measurement
 #' @details DETAILS
@@ -71,9 +73,9 @@ get_sigma_t <- function(v_t) {
 #'  }
 #' }
 #' @export
-get_ci_flux <- function(sigma_chi = set_units(25, nmol_n2o / mol),
-                        height   = set_units(0.23, m),
-                        sigma_t  = set_units(90, s),
+get_ci_flux <- function(sigma_chi = units::set_units(25, nmol_n2o / mol),
+                        height   = units::set_units(0.23, m),
+                        sigma_t  = units::set_units(90, s),
                         n_gas = 10) {  # no. samples
   ci_b <- sqrt(sigma_chi^2 / ((n_gas - 1) * sigma_t^2)) * 1.96
   # convert ci_b from mol/mol/s to flux units mol/m2/s
@@ -83,13 +85,13 @@ get_ci_flux <- function(sigma_chi = set_units(25, nmol_n2o / mol),
 
 #' @title get_dt_ci
 #' @description FUNCTION_DESCRIPTION
-#' @param sigma_chi PARAM_DESCRIPTION, Default: set_units(25, nmol_n2o/mol)
-#' @param height PARAM_DESCRIPTION, Default: set_units(0.23, m)
-#' @param sigma_t PARAM_DESCRIPTION, Default: set_units(90, s)
+#' @param sigma_chi PARAM_DESCRIPTION, Default: units::set_units(25, nmol_n2o/mol)
+#' @param height PARAM_DESCRIPTION, Default: units::set_units(0.23, m)
+#' @param sigma_t PARAM_DESCRIPTION, Default: units::set_units(90, s)
 #' @param n_gas PARAM_DESCRIPTION, Default: 10
 #' @param meanlog PARAM_DESCRIPTION, Default: 0
 #' @param sdlog PARAM_DESCRIPTION, Default: 1
-#' @param max_flux PARAM_DESCRIPTION, Default: set_units(5, nmol_n2o/m^2/s)
+#' @param max_flux PARAM_DESCRIPTION, Default: units::set_units(5, nmol_n2o/m^2/s)
 #' @return A data table containg CI values
 #' @details DETAILS
 #' @examples
@@ -99,13 +101,13 @@ get_ci_flux <- function(sigma_chi = set_units(25, nmol_n2o / mol),
 #'  }
 #' }
 #' @export
-get_dt_ci <- function(sigma_chi = set_units(25, nmol_n2o / mol),
-                      height   = set_units(0.23, m),
-                      sigma_t  = set_units(90, s),
+get_dt_ci <- function(sigma_chi = units::set_units(25, nmol_n2o / mol),
+                      height   = units::set_units(0.23, m),
+                      sigma_t  = units::set_units(90, s),
                       n_gas = 10,        # no. samples
                       meanlog = 0,
                       sdlog = 1,
-                      max_flux = set_units(5, nmol_n2o / m^2 / s)) {
+                      max_flux = units::set_units(5, nmol_n2o / m^2 / s)) {
   zero_flux <- max_flux - max_flux # get zero in flux units
   v_flux <- seq(zero_flux, max_flux, by = max_flux / 100)
   v_prob <- drop_units(dlnorm(v_flux, meanlog, sdlog))
@@ -123,9 +125,9 @@ get_dt_ci <- function(sigma_chi = set_units(25, nmol_n2o / mol),
 
 #' @title get_percent_detectable
 #' @description FUNCTION_DESCRIPTION
-#' @param sigma_chi PARAM_DESCRIPTION, Default: set_units(25, nmol_n2o/mol)
-#' @param height PARAM_DESCRIPTION, Default: set_units(0.23, m)
-#' @param sigma_t PARAM_DESCRIPTION, Default: set_units(90, s)
+#' @param sigma_chi PARAM_DESCRIPTION, Default: units::set_units(25, nmol_n2o/mol)
+#' @param height PARAM_DESCRIPTION, Default: units::set_units(0.23, m)
+#' @param sigma_t PARAM_DESCRIPTION, Default: units::set_units(90, s)
 #' @param n_gas PARAM_DESCRIPTION, Default: 10
 #' @param meanlog PARAM_DESCRIPTION, Default: 0
 #' @param sdlog PARAM_DESCRIPTION, Default: 1
@@ -138,9 +140,9 @@ get_dt_ci <- function(sigma_chi = set_units(25, nmol_n2o / mol),
 #'  }
 #' }
 #' @export
-get_percent_detectable <- function(sigma_chi = set_units(25, nmol_n2o / mol),
-                                   height   = set_units(0.23, m),
-                                   sigma_t  = set_units(90, s),
+get_percent_detectable <- function(sigma_chi = units::set_units(25, nmol_n2o / mol),
+                                   height   = units::set_units(0.23, m),
+                                   sigma_t  = units::set_units(90, s),
                                    n_gas = 10,        # no. samples
                                    meanlog = 0,
                                    sdlog = 1
@@ -180,16 +182,16 @@ get_sigma_spatial <- function(n_samples = 10, n_sims = 1e5, location = 0,
 
 #' @title get_ci_omega
 #' @description FUNCTION_DESCRIPTION
-#' @param sigma_chi PARAM_DESCRIPTION, Default: set_units(10, nmol_n2o/mol)
-#' @param height PARAM_DESCRIPTION, Default: set_units(0.23, m)
-#' @param t_max PARAM_DESCRIPTION, Default: set_units(30 * 60, s)
+#' @param sigma_chi PARAM_DESCRIPTION, Default: units::set_units(10, nmol_n2o/mol)
+#' @param height PARAM_DESCRIPTION, Default: units::set_units(0.23, m)
+#' @param t_max PARAM_DESCRIPTION, Default: units::set_units(30 * 60, s)
 #' @param n_gas PARAM_DESCRIPTION, Default: 4
-#' @param N_appl PARAM_DESCRIPTION, Default: set_units(0.1489069 * 1e+09, nmol_n2o/m^2)
+#' @param N_appl PARAM_DESCRIPTION, Default: units::set_units(0.1489069 * 1e+09, nmol_n2o/m^2)
 #' @param omega PARAM_DESCRIPTION, Default: 0.01
 #' @param n_days PARAM_DESCRIPTION, Default: 28
 #' @param n_mmnt_per_day PARAM_DESCRIPTION, Default: 10
 #' @param n_sims PARAM_DESCRIPTION, Default: 3
-#' @param d_max PARAM_DESCRIPTION, Default: set_units(28 * secs_per_day, s)
+#' @param d_max PARAM_DESCRIPTION, Default: units::set_units(28 * secs_per_day, s)
 #' @param delta PARAM_DESCRIPTION, Default: 11.8
 #' @param k PARAM_DESCRIPTION, Default: 0.86
 #' @param sigma_s PARAM_DESCRIPTION, Default: 1.5
@@ -208,20 +210,20 @@ get_sigma_spatial <- function(n_samples = 10, n_sims = 1e5, location = 0,
 #' }
 #' @export
 get_ci_omega <- function(
-                         sigma_chi = set_units(10, nmol_n2o / mol),
-                         height   = set_units(0.23, m),
+                         sigma_chi = units::set_units(10, nmol_n2o / mol),
+                         height   = units::set_units(0.23, m),
                          # flux measurement time length, s
-                         t_max = set_units(30 * 60, s),
+                         t_max = units::set_units(30 * 60, s),
                          n_gas = 4,        # no. gas samples per mmnt
                          #            enter as mol/m2 * 1e9 = nmol/m2
-                         N_appl = set_units(0.1489069 * 1e9, nmol_n2o / m^2),
+                         N_appl = units::set_units(0.1489069 * 1e9, nmol_n2o / m^2),
                          omega = 0.01,
                          n_days = 28,
                          n_mmnt_per_day = 10,
                          n_sims = 3,
                          # time length over which measurements are taken,
                          # ususally two weeks to two months but given in secs
-                         d_max = set_units(28 * secs_per_day, s),
+                         d_max = units::set_units(28 * secs_per_day, s),
                          delta = 11.8,
                          k = 0.86,
                          sigma_s = 1.5,
@@ -248,12 +250,12 @@ get_ci_omega <- function(
 
   n_mmnts <- n_days * n_mmnt_per_day
   # vector of measurement times
-  v_times <- rep(seq(set_units(1, s), d_max, length.out = n_days),
+  v_times <- rep(seq(units::set_units(1, s), d_max, length.out = n_days),
     times = n_mmnt_per_day)
   # vector of true instantaneous mean flux
-  # / set_units(1, s) is shortcut to make units correct
+  # / units::set_units(1, s) is shortcut to make units correct
   v_F_mean <- drop_units(dlnorm(v_times, delta, k)) * omega * N_appl /
-    set_units(1, s)
+    units::set_units(1, s)
 
   # true cumulative flux
   F_cum <- drop_units(plnorm(d_max, delta, k)) * omega * N_appl
@@ -284,10 +286,10 @@ get_ci_omega <- function(
   # get arithmetic mean of simulated flux at each time point
   df_F_obs_mean <- aggregate(m_F_obs, by = list(v_times), FUN = mean)
   v_F_cum_obs <- sapply(1 + 1:n_sims, function(x) {
-    trapz(df_F_obs_mean$Group.1, df_F_obs_mean[, x])
+    caTools::trapz(df_F_obs_mean$Group.1, df_F_obs_mean[, x])
   })
 
-  v_F_cum_obs <- set_units(v_F_cum_obs, nmol_n2o / m^2)
+  v_F_cum_obs <- units::set_units(v_F_cum_obs, nmol_n2o / m^2)
   v_omega_obs <- drop_units(v_F_cum_obs / N_appl)
   v_F_cum_error <- v_F_cum_obs - F_cum
 
@@ -308,8 +310,8 @@ get_ci_omega <- function(
       F_sample = m_F_sample[, 1], F_obs = m_F_obs[, 1]
     )
 
-    t <- seq(set_units(0, s), d_max, by = d_max / 1000)
-    flux <- drop_units(dlnorm(t, delta, k)) * N_appl * omega / set_units(1, s)
+    t <- seq(units::set_units(0, s), d_max, by = d_max / 1000)
+    flux <- drop_units(dlnorm(t, delta, k)) * N_appl * omega / units::set_units(1, s)
     df_hr <- data.frame(t = t / secs_per_day, flux = flux)
     cols <- c("True mean" = "black", "With spatial varn" = "blue",
       "With spatial varn + mmnt noise" = "red")

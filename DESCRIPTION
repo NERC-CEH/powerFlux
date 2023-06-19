@@ -1,32 +1,31 @@
 Package: powerFlux
 Title: Power Flux
 Version: 0.0.1
-Authors@R: person("Peter", "Levy",
-                  email = "plevy@ceh.ac.uk",
-                  role = c("aut", "cre", "cph"),
-                  comment=c(ORCID = "https://orcid.org/0000-0002-8505-1901"))
-Description: This package is provides code for statistical power analysis of
-             experiments based on chamber flux measurements, particularly those
-             looking at emission factors for N2O.
-Encoding: UTF-8
-Depends: R (>= 3.1.2)
+Authors@R: 
+    person("Peter", "Levy", , "plevy@ceh.ac.uk", role = c("aut", "cre", "cph"),
+           comment = c(ORCID = "https://orcid.org/0000-0002-8505-1901"))
+Description: This package is provides code for statistical power analysis
+    of experiments based on chamber flux measurements, particularly those
+    looking at emission factors for N2O.
 License: MIT + file LICENSE
-LazyData: true
-Suggests:
-    testthat,
-    knitr,
-    covr,
-    roxygen2,
-    rmarkdown,
-    viridis,
-    pkgload
-VignetteBuilder: knitr
+Depends: 
+    R (>= 3.1.2)
 Imports:
-    here,
-    ggplot2,
-    ggforce,
-    data.table,
     caTools,
-    units,
-    rlang (>= 0.4.11)
+    data.table,
+    ggforce,
+    ggplot2,
+    rlang (>= 0.4.11),
+    units
+Suggests:
+    here,
+    knitr,
+    pkgload,
+    rmarkdown,
+    testthat,
+    viridis
+VignetteBuilder: 
+    knitr
+Encoding: UTF-8
+LazyData: true
 RoxygenNote: 7.2.3

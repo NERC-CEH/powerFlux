@@ -33,9 +33,10 @@ install_github("NERC-CEH/powerFlux")
 ```
 
 ## Using the package
-Now we can load the package.
-```{r}
+Now we can load the package, plus the units package on which it depends.
+```{r, warning=FALSE, message=FALSE}
 library(powerFlux)
+library(units)
 ```
 
 You can then call the `powerFlux` functions directly from the R command line, as described below. The basic input is a set of parameters which define the chamber set-up and sampling characteristics.
@@ -61,6 +62,9 @@ Below, we specify $\sigma_\chi$ of 20 nmol N$_2$O/mol,
 10 gas samples, spread regularly over time 5 minutes, and a chamber height of 23 cm.
 
 ```{r, echo = TRUE}
+# define the conversion unit between g N and moles of N2O
+units::install_unit("mol_n2o", "28 g", "mol wt of N in N2O")
+
 sigma_chi <- set_units(20, nmol_n2o/mol)
 height <- set_units(0.23, m)
 t_max <- set_units(5 * 60, s)

@@ -5,20 +5,20 @@
 \title{get_percent_detectable}
 \usage{
 get_percent_detectable(
-  sigma_chi = set_units(25, nmol_n2o/mol),
-  height = set_units(0.23, m),
-  sigma_t = set_units(90, s),
+  sigma_chi = units::set_units(25, nmol_n2o/mol),
+  height = units::set_units(0.23, m),
+  sigma_t = units::set_units(90, s),
   n_gas = 10,
   meanlog = 0,
   sdlog = 1
 )
 }
 \arguments{
-\item{sigma_chi}{PARAM_DESCRIPTION, Default: set_units(25, nmol_n2o/mol)}
+\item{sigma_chi}{PARAM_DESCRIPTION, Default: units::set_units(25, nmol_n2o/mol)}
 
-\item{height}{PARAM_DESCRIPTION, Default: set_units(0.23, m)}
+\item{height}{PARAM_DESCRIPTION, Default: units::set_units(0.23, m)}
 
-\item{sigma_t}{PARAM_DESCRIPTION, Default: set_units(90, s)}
+\item{sigma_t}{PARAM_DESCRIPTION, Default: units::set_units(90, s)}
 
 \item{n_gas}{PARAM_DESCRIPTION, Default: 10}
 
